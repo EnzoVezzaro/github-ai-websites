@@ -1,0 +1,335 @@
+name: Contributor Badge
+
+on:
+  pull_request:
+    types: [closed]
+
+permissions:
+  contents: write
+  pull-requests: read
+
+concurrency:
+  group: badge-${{ github.event.pull_request.user.login }}
+  cancel-in-progress: false
+
+jobs:
+  badge:
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Generate contributor badge
+        uses: actions/github-script@v9
+        env:
+          CONTRIBUTOR: ${{ github.event.pull_request.user.login }}
+        with:
+          script: |
+            const fs = require("fs");
+            const path = require("path");
+
+            const contributor = process.env.CONTRIBUTOR;
+            const { owner, repo } = context.repo;
+
+            // Get all closed PRs created by this contributor.
+            const pulls = await github.paginate(
+              github.rest.pulls.list,
+              {
+                owner,
+                repo,
+                state: "closed",
+                creator: contributor,
+                per_page: 100
+              }
+            );
+
+            // Only count merged PRs.
+            const merged = pulls.filter(pr => pr.merged_at);
+            const count = merged.length;
+
+            // Participation levels — universe builder tone.
+            let level = "Visitor";
+            let tagline = "First steps into the forge";
+            let accentFrom = "#8b949e";
+            let accentTo = "#6e7681";
+            let tierBg = "#21262d";
+
+            if (count >= 25) {
+              level = "Architect";
+              tagline = "Shaping the multiverse";
+              accentFrom = "#f0883e";
+              accentTo = "#d29922";
+              tierBg = "#2d1f0e";
+            } else if (count >= 10) {
+              level = "Visionary";
+              tagline = "Forging new realities";
+              accentFrom = "#a371f7";
+              accentTo = "#8957e5";
+              tierBg = "#1f1435";
+            } else if (count >= 5) {
+              level = "Creator";
+              tagline = "Building worlds of their own";
+              accentFrom = "#58a6ff";
+              accentTo = "#1f6feb";
+              tierBg = "#0d2137";
+            } else if (count >= 3) {
+              level = "Explorer";
+              tagline = "Charting uncharted territory";
+              accentFrom = "#3fb950";
+              accentTo = "#238636";
+              tierBg = "#0d2818";
+            } else if (count >= 1) {
+              level = "Visitor";
+              tagline = "First steps into the forge";
+              accentFrom = "#8b949e";
+              accentTo = "#6e7681";
+              tierBg = "#21262d";
+            }
+
+            const escapeXml = value =>
+              String(value)
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&apos;");
+
+            const safeContributor = escapeXml(contributor);
+            const safeLevel = escapeXml(level);
+            const safeTagline = escapeXml(tagline);
+
+            // Universe icons — different per tier.
+            const icons = {
+              Visitor: `
+                <circle cx="75" cy="75" r="22" fill="none" stroke="white" stroke-width="2.5" opacity="0.9"/>
+                <circle cx="75" cy="75" r="6" fill="white"/>
+              `,
+              Explorer: `
+                <polygon points="75,52 82,70 100,73 87,86 90,104 75,96 60,104 63,86 50,73 68,70" fill="white" opacity="0.9"/>
+              `,
+              Creator: `
+                <path d="M58 85 L75 55 L92 85 Z" fill="none" stroke="white" stroke-width="2.5" stroke-linejoin="round" opacity="0.9"/>
+                <circle cx="75" cy="73" r="5" fill="white"/>
+                <line x1="75" y1="63" x2="75" y2="58" stroke="white" stroke-width="2" opacity="0.6"/>
+                <line x1="83" y1="78" x2="87" y2="81" stroke="white" stroke-width="2" opacity="0.6"/>
+                <line x1="67" y1="78" x2="63" y2="81" stroke="white" stroke-width="2" opacity="0.6"/>
+              `,
+              Visionary: `
+                <circle cx="75" cy="75" r="20" fill="none" stroke="white" stroke-width="2.5" opacity="0.9"/>
+                <circle cx="75" cy="75" r="8" fill="white" opacity="0.9"/>
+                <ellipse cx="75" cy="75" rx="34" ry="12" fill="none" stroke="white" stroke-width="1.5" opacity="0.5" transform="rotate(-25 75 75)"/>
+                <ellipse cx="75" cy="75" rx="34" ry="12" fill="none" stroke="white" stroke-width="1.5" opacity="0.35" transform="rotate(25 75 75)"/>
+              `,
+              Architect: `
+                <rect x="60" y="60" width="30" height="30" rx="4" fill="none" stroke="white" stroke-width="2.5" opacity="0.9" transform="rotate(45 75 75)"/>
+                <circle cx="75" cy="75" r="6" fill="white"/>
+                <line x1="75" y1="53" x2="75" y2="48" stroke="white" stroke-width="2" opacity="0.6"/>
+                <line x1="75" y1="97" x2="75" y2="102" stroke="white" stroke-width="2" opacity="0.6"/>
+                <line x1="53" y1="75" x2="48" y2="75" stroke="white" stroke-width="2" opacity="0.6"/>
+                <line x1="97" y1="75" x2="102" y2="75" stroke="white" stroke-width="2" opacity="0.6"/>
+              `,
+            };
+
+            const svg = `
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="620"
+              height="150"
+              viewBox="0 0 620 150"
+              role="img"
+              aria-labelledby="title desc"
+            >
+              <title id="title">
+                GitHub AI Web Forge ${safeLevel} — ${safeContributor}
+              </title>
+
+              <desc id="desc">
+                ${safeContributor} is a ${safeLevel} at GitHub AI Web Forge. ${safeTagline}. ${count} universe${count === 1 ? "" : "s"} contributed.
+              </desc>
+
+              <defs>
+                <linearGradient
+                  id="background"
+                  x1="0"
+                  y1="0"
+                  x2="1"
+                  y2="1"
+                >
+                  <stop offset="0%" stop-color="#161b22"/>
+                  <stop offset="100%" stop-color="#0d1117"/>
+                </linearGradient>
+
+                <linearGradient
+                  id="accent"
+                  x1="0"
+                  y1="0"
+                  x2="1"
+                  y2="1"
+                >
+                  <stop offset="0%" stop-color="${accentFrom}"/>
+                  <stop offset="100%" stop-color="${accentTo}"/>
+                </linearGradient>
+
+                <filter
+                  id="shadow"
+                  x="-20%"
+                  y="-20%"
+                  width="140%"
+                  height="140%"
+                >
+                  <feDropShadow
+                    dx="0"
+                    dy="5"
+                    stdDeviation="7"
+                    flood-opacity="0.28"
+                  />
+                </filter>
+              </defs>
+
+              <!-- Main badge -->
+              <rect
+                x="3"
+                y="3"
+                width="614"
+                height="144"
+                rx="22"
+                fill="url(#background)"
+                stroke="#30363d"
+                stroke-width="2"
+                filter="url(#shadow)"
+              />
+
+              <!-- Icon background -->
+              <rect
+                x="20"
+                y="20"
+                width="110"
+                height="110"
+                rx="20"
+                fill="url(#accent)"
+              />
+
+              <!-- Tier icon -->
+              ${icons[level] || icons.Visitor}
+
+              <!-- Brand -->
+              <text
+                x="153"
+                y="46"
+                fill="#8b949e"
+                font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif"
+                font-size="13"
+                font-weight="700"
+                letter-spacing="2"
+              >
+                GITHUB AI WEB FORGE
+              </text>
+
+              <!-- Tier level -->
+              <text
+                x="153"
+                y="80"
+                fill="#f0f6fc"
+                font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif"
+                font-size="28"
+                font-weight="800"
+              >
+                ${safeLevel}
+              </text>
+
+              <!-- Tagline -->
+              <text
+                x="153"
+                y="102"
+                fill="#8b949e"
+                font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif"
+                font-size="12"
+                font-style="italic"
+              >
+                ${safeTagline}
+              </text>
+
+              <!-- Username -->
+              <text
+                x="153"
+                y="122"
+                fill="#6e7681"
+                font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif"
+                font-size="14"
+                font-weight="500"
+              >
+                @${safeContributor}
+              </text>
+
+              <!-- Universe count -->
+              <rect
+                x="490"
+                y="40"
+                width="108"
+                height="70"
+                rx="14"
+                fill="${tierBg}"
+                stroke="#30363d"
+              />
+
+              <text
+                x="544"
+                y="63"
+                text-anchor="middle"
+                fill="#8b949e"
+                font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif"
+                font-size="10"
+                font-weight="700"
+                letter-spacing="1.5"
+              >
+                UNIVERSES
+              </text>
+
+              <text
+                x="544"
+                y="90"
+                text-anchor="middle"
+                fill="#f0f6fc"
+                font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif"
+                font-size="22"
+                font-weight="800"
+              >
+                ${count}
+              </text>
+            </svg>
+            `.trim();
+
+            const filename =
+              `badges/contributors/${contributor}.svg`;
+
+            fs.mkdirSync(
+              path.dirname(filename),
+              { recursive: true }
+            );
+
+            fs.writeFileSync(
+              filename,
+              svg,
+              "utf8"
+            );
+
+            core.info(
+              `Generated ${filename} for ${contributor} (${count} merged PRs)`
+            );
+
+      - name: Commit badge
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          git add badges/contributors/
+
+          if git diff --cached --quiet; then
+            echo "No badge changes."
+            exit 0
+          fi
+
+          git commit -m "chore: update contributor badge for @${{ github.event.pull_request.user.login }}"
+          git push

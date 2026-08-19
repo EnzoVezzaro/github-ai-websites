@@ -14,7 +14,7 @@ export function Onboarding({ onDone }: { onDone: () => void }) {
   const { settings, update } = useSettings();
   const [step, setStep] = useState(0);
   const [githubPat, setGithubPat] = useState(settings.githubToken || '');
-  const [aiProvider, setAiProvider] = useState<'openai' | 'openai-compatible' | 'anthropic'>(
+  const [aiProvider, setAiProvider] = useState<'openai-compatible' | 'local'>(
     (settings.aiProvider as any) || 'openai-compatible'
   );
   const [aiApiKey, setAiApiKey] = useState(settings.aiApiKey || '');
@@ -81,14 +81,11 @@ export function Onboarding({ onDone }: { onDone: () => void }) {
                 <label className="text-sm font-medium">Provider</label>
                 <select value={aiProvider} onChange={e => setAiProvider(e.target.value as any)} className="select">
                   <option value="openai-compatible">OpenAI Compatible</option>
-                  <option value="openai">OpenAI</option>
-                  <option value="anthropic">Anthropic</option>
+                  <option value="local">Compatible Local Model</option>
                 </select>
                 <label className="text-sm font-medium">API Key</label>
-                <input value={aiApiKey} onChange={e => setAiApiKey(e.target.value)} type="password" placeholder="sk-..." className="select" />
-                {aiProvider === 'openai-compatible' && (
-                  <input value={aiBaseUrl} onChange={e => setAiBaseUrl(e.target.value)} placeholder="Base URL" className="select" />
-                )}
+                <input value={aiApiKey} onChange={e => setAiApiKey(e.target.value)} type="password" placeholder={aiProvider === 'local' ? 'optional for local' : 'sk-...'} className="select" />
+                <input value={aiBaseUrl} onChange={e => setAiBaseUrl(e.target.value)} placeholder={aiProvider === 'local' ? 'http://localhost:11434/v1' : 'https://…/v1'} className="select" />
               </div>
             )}
             {step === 3 && (

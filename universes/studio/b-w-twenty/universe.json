@@ -1,0 +1,59 @@
+{
+  "meta": {
+    "id": "b-w-twenty",
+    "name": "Universe 05 // B&W 20s",
+    "slug": "b-w-twenty",
+    "description": "1920s silent film intertitles, hand-drawn black ink on aged paper with vignette grain.",
+    "author": "Silent Era",
+    "version": "1.0",
+    "createdAt": "2026-08-19T03:39:26.370Z",
+    "updatedAt": "2026-08-19T03:39:26.370Z"
+  },
+  "content": {
+    "intro": [
+      {
+        "id": "ocean-intro",
+        "zone": "intro",
+        "type": "text",
+        "data": "The ocean is a vast, interconnected neural network of fluid dynamics and ancient memory."
+      }
+    ],
+    "story": [
+      {
+        "id": "ocean-story",
+        "zone": "story",
+        "type": "text",
+        "data": "From bioluminescent trenches to sunlit surface gyres, pressure and current compose an unceasing planetary symphony."
+      }
+    ],
+    "ideas": [
+      {
+        "id": "ocean-ideas",
+        "zone": "ideas",
+        "type": "text",
+        "data": "Deep ocean telemetry, synthetic kelp forests, acoustic ecology."
+      }
+    ],
+    "media": [
+      {
+        "id": "ocean-media",
+        "zone": "media",
+        "type": "text",
+        "data": "![Abyssal](https://images.unsplash.com/photo-1518837695005-2083093ee35b?auto=format&fit=crop&w=1200&q=80)"
+      }
+    ],
+    "closing": [
+      {
+        "id": "ocean-closing",
+        "zone": "closing",
+        "type": "text",
+        "data": "Listen closely to the undertow. It remembers everything."
+      }
+    ]
+  },
+  "layout": {
+    "html": "<!doctype html><html><head><style>{{css}}</style></head><body class=\"bw\"><div class=\"grain\"></div><div class=\"vign\"></div><div class=\"film\"><div class=\"inter intro-card\"><h2>INTRO</h2><p>{{intro}}</p></div><div class=\"inter story-card\"><h2>STORY</h2><p>{{story}}</p></div><div class=\"inter ideas-card\"><h2>IDEAS</h2><p>{{ideas}}</p></div><div class=\"media-halftone\">{{media}}</div><div class=\"inter closing-card\"><h2>FIN</h2><p>{{closing}}</p></div><div class=\"title\">★ THE END ★</div></div></body></html>",
+    "css": "@import url('https://fonts.googleapis.com/css2?family=Special+Elite&display=swap');body.bw{margin:0;padding:0;background:#1a1a1a;color:#fff;font-family:'Special Elite','Courier New',monospace;min-height:100vh;overflow:hidden;position:relative;filter:grayscale(100%) contrast(120%)}.grain{position:fixed;inset:0;background-image:url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='256' height='256'%3E%3Cfilter id='n'%3E%3CfeTurbulence baseFrequency='0.9' numOctaves='4'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.35'/%3E%3C/svg%3E\");pointer-events:none;z-index:99;animation:s 1.5s steps(5) infinite}@keyframes s{0%{transform:translate(0,0)}50%{transform:translate(-3px,2px)}100%{transform:translate(2px,-2px)}}.vign{position:fixed;inset:0;background:radial-gradient(ellipse at center,transparent 30%,rgba(0,0,0,0.9) 90%);pointer-events:none;z-index:50}.film{position:relative;z-index:1;max-width:650px;margin:2rem auto;padding:2rem}.inter{border:3px double #fff;padding:2rem;margin-bottom:1.5rem;text-align:center;frame}.inter h2{font-family:'Special Elite',monospace;letter-spacing:5px;margin:0 0 1rem 0;font-size:12px}.inter p{font-size:18px;line-height:1.7;letter-spacing:1px;margin:0}.intro-card{background:#0a0a0a}.story-card{background:#111}.ideas-card{background:#0a0a0a}.closing-card{background:#000}.media-halftone img{width:100%;height:320px;object-fit:cover;filter:grayscale(100%) contrast(140%) sepia(30%);border:3px double #fff;margin-bottom:1.5rem}.title{position:fixed;bottom:40px;left:0;right:0;text-align:center;font-size:24px;letter-spacing:10px;opacity:0.8;z-index:51}}",
+    "js": ""
+  }
+}

@@ -1,16 +1,16 @@
 import { useEffect, useMemo, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { mockProjects, mockLayouts } from '../lib/mock';
+import { defaultProjects, defaultLayouts } from '../lib/universesData';
 import { lsGet, lsSet, Keys } from '../lib/storage';
 import { Preview } from './Preview';
 import { Editor } from './Editor';
 import type { ExplorerState, ProjectContent } from '../types';
 
 export function Explorer() {
-  const [state, setState] = useState<ExplorerState>({ projectId: 'ocean', layoutId: 'brutalist' });
+  const [state, setState] = useState<ExplorerState>({ projectId: 'cartoon-network', layoutId: 'cartoon-network' });
   const [editMode, setEditMode] = useState(false);
   const [projectDraft, setProjectDraft] = useState<ProjectContent>(
-    mockProjects.find(p => p.id === state.projectId)!
+    defaultProjects.find(p => p.id === state.projectId)!
   );
 
   useEffect(() => {
@@ -27,11 +27,11 @@ export function Explorer() {
   }, [state]);
 
   useEffect(() => {
-    setProjectDraft(mockProjects.find(p => p.id === state.projectId)!);
+    setProjectDraft(defaultProjects.find(p => p.id === state.projectId)!);
   }, [state.projectId]);
 
   const project = useMemo(() => projectDraft, [projectDraft]);
-  const layout = useMemo(() => mockLayouts.find(l => l.meta.id === state.layoutId)!, [state.layoutId]);
+  const layout = useMemo(() => defaultLayouts.find(l => l.meta.id === state.layoutId)!, [state.layoutId]);
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-zinc-50 to-white dark:from-zinc-950 dark:to-black">
@@ -52,13 +52,13 @@ export function Explorer() {
             <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} className="card p-5">
               <h2 className="font-medium mb-3">Content</h2>
               <select value={state.projectId} onChange={e => setState(s => ({ ...s, projectId: e.target.value }))} className="select">
-                {mockProjects.map(p => <option key={p.id} value={p.id}>{p.title}</option>)}
+                {defaultProjects.map(p => <option key={p.id} value={p.id}>{p.title}</option>)}
               </select>
             </motion.div>
             <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.05 }} className="card p-5">
               <h2 className="font-medium mb-3">Layout</h2>
               <select value={state.layoutId} onChange={e => setState(s => ({ ...s, layoutId: e.target.value }))} className="select">
-                {mockLayouts.map(l => <option key={l.meta.id} value={l.meta.id}>{l.meta.name}</option>)}
+                {defaultLayouts.map(l => <option key={l.meta.id} value={l.meta.id}>{l.meta.name}</option>)}
               </select>
             </motion.div>
           </aside>

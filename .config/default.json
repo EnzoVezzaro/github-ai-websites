@@ -1,0 +1,30 @@
+{
+  "ai": {
+    "provider": "openai-compatible",
+    "apiKey": "",
+    "model": "gpt-4o-mini",
+    "baseUrl": "https://api.openai.com/v1"
+  },
+  "github": {
+    "clientId": "",
+    "token": ""
+  },
+  "plugins": {
+    "enabled": [
+      "ui",
+      "spatial",
+      "forge",
+      "wizard",
+      "github",
+      "collaboration",
+      "tldraw",
+      "fabric-theme",
+      "mcp",
+      "analysis"
+    ]
+  },
+  "universes": {
+    "defaultLayout": "grid",
+    "theme": "dark"
+  }
+}

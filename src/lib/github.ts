@@ -1,10 +1,27 @@
-import { lsGet, Keys } from './storage';
+import { lsGet, lsRemove, Keys } from './storage';
 import type { ProjectContent, LayoutFiles } from '../types';
 
 const GITHUB_REPO = import.meta.env.VITE_GITHUB_REPO || 'github-ai-websites/github-ai-websites';
 
 export function getGitHubToken(): string | null {
   return lsGet<string>(Keys.githubToken);
+}
+
+export function logoutGitHub(): void {
+  lsRemove(Keys.githubToken);
+  lsRemove(Keys.githubUser);
+}
+
+export async function fetchGitHubUser(token: string): Promise<{ login: string; avatar_url: string; name?: string } | null> {
+  try {
+    const res = await fetch('https://api.github.com/user', {
+      headers: { Accept: 'application/vnd.github+json', Authorization: `Bearer ${token}` },
+    });
+    if (!res.ok) return null;
+    return await res.json();
+  } catch {
+    return null;
+  }
 }
 
 export async function githubFetch(path: string, token?: string) {

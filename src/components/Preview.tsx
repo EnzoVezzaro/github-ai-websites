@@ -1,8 +1,10 @@
 import type { ProjectContent, LayoutFiles } from '../types';
 import { useMemo } from 'react';
+import { injectZoneEngine, markZonePanels } from '../lib/zoneEngine';
 
-export function Preview({ project, layout }: { project: ProjectContent; layout: LayoutFiles; editMode?: boolean }) {
+export function Preview({ project, layout }: { project: ProjectContent; layout: LayoutFiles | null; editMode?: boolean }) {
   const htmlContent = useMemo(() => {
+    if (!layout) return '';
     let html = layout.html;
     let css = layout.css;
 
@@ -20,14 +22,16 @@ export function Preview({ project, layout }: { project: ProjectContent; layout: 
       .replace(/{{closing}}/g, project.closing)
       .replace(/{{css}}/g, css);
 
-    return html;
+    // The universe's own content panels become movable `.zone` containers.
+    html = markZonePanels(html, layout.meta.id);
+    return injectZoneEngine(html);
   }, [project, layout]);
 
   return (
     <div className="absolute inset-0 w-full h-full bg-black">
       <iframe
         srcDoc={htmlContent}
-        title={layout.meta.name}
+        title={layout?.meta.name ?? 'Preview'}
         className="w-full h-full border-0 bg-black"
         sandbox="allow-scripts"
       />

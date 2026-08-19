@@ -1,18 +1,23 @@
-import { useMemo, useState, useEffect } from 'react';
+import { useMemo, useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { mockProjects, mockLayouts } from '../lib/mock';
+import { defaultProjects, defaultLayouts } from '../lib/universesData';
 import { Preview } from './Preview';
+import { SettingsPanel } from './SettingsPanel';
+import { DraggablePanel } from './DraggablePanel';
 import type { ProjectContent, LayoutFiles } from '../types';
+import { usePlugins } from '../plugins';
+import { shortcutsManager, useShortcuts, type ShortcutAction } from '../lib/shortcuts';
 import { Edit3, Code, Send, Settings, Compass, Orbit, Sparkles, Layers, Grid, Sliders, ArrowRight, ArrowLeft, Check, GitPullRequest, ExternalLink } from 'lucide-react';
 
 export function Studio() {
-  const [projectId, setProjectId] = useState('ocean');
-  const [layoutId, setLayoutId] = useState('brutalist');
+  const { isEnabled } = usePlugins();
+  const [projectId, setProjectId] = useState('cartoon-network');
+  const [layoutId, setLayoutId] = useState('cartoon-network');
   const [mode, setMode] = useState<'explore' | 'hub' | 'edit' | 'forge' | 'publish' | 'settings'>('explore');
   const [showDock, setShowDock] = useState(true);
 
-  const [projects, setProjects] = useState<ProjectContent[]>(mockProjects);
-  const [layouts, setLayouts] = useState<LayoutFiles[]>(mockLayouts);
+  const [projects, setProjects] = useState<ProjectContent[]>(defaultProjects);
+  const [layouts, setLayouts] = useState<LayoutFiles[]>(defaultLayouts);
 
   const [sparkKey, setSparkKey] = useState(0);
 
@@ -56,6 +61,49 @@ export function Studio() {
 
   // GitHub Publishing Live Activity State
   const [pubStep, setPubStep] = useState<'idle' | 'preparing' | 'sending' | 'pr' | 'checks' | 'publishing' | 'success' | 'error'>('idle');
+
+  const [showShortcuts, setShowShortcuts] = useState(false);
+  const { bindings: shortcutBindings } = useShortcuts();
+  const shortcutKey = (action: ShortcutAction) => shortcutsManager.getKey(action);
+
+  // Clicking the same icon opens/closes the action (toggle).
+  const toggleMode = useCallback((target: typeof mode) => {
+    setMode(prev => {
+      if (prev === target) {
+        setShowDock(true);
+        return 'explore';
+      }
+      setShowDock(target === 'explore');
+      return target;
+    });
+  }, []);
+
+  // Keyboard shortcuts — driven by the shortcuts manager (rebindable in settings).
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.metaKey || e.ctrlKey || e.altKey) return;
+      const t = e.target as HTMLElement | null;
+      if (t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.tagName === 'SELECT' || t.isContentEditable)) return;
+
+      const action = shortcutsManager.handleKey(e);
+      if (!action) return;
+      e.preventDefault();
+
+      const dispatch: Record<ShortcutAction, () => void> = {
+        explore: () => toggleMode('explore'),
+        hub: () => toggleMode('hub'),
+        wizard: () => toggleMode('edit'),
+        forge: () => toggleMode('forge'),
+        publish: () => toggleMode('publish'),
+        settings: () => toggleMode('settings'),
+        close: () => { setMode('explore'); setShowDock(true); },
+        shortcuts: () => setShowShortcuts(v => !v),
+      };
+      dispatch[action]();
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [toggleMode]);
 
   useEffect(() => {
     setProjectDraft(currentProject);
@@ -129,9 +177,9 @@ export function Studio() {
       </div>
 
       {/* Floating Invisible Layer / Header */}
-      <header className="absolute top-4 left-6 right-6 z-30 flex items-center justify-between pointer-events-none">
-        {/* Brand & Countdown */}
-        <div className="pointer-events-auto flex items-center gap-3 bg-black/60 border border-white/10 rounded-2xl px-4 py-2.5 backdrop-blur-2xl shadow-2xl">
+      {/* Floating Header Controls — freely draggable */}
+      <DraggablePanel id="studio-brand" bare defaultX={24} defaultY={16} className="pointer-events-auto z-30">
+        <div className="flex items-center gap-3 rounded-2xl px-4 py-2.5 backdrop-blur-2xl shadow-2xl cursor-grab active:cursor-grabbing">
           <motion.div whileHover={{ rotate: 180 }} transition={{ duration: 0.8 }} className="w-8 h-8 rounded-xl bg-gradient-to-br from-violet-600 via-fuchsia-600 to-indigo-600 grid place-items-center shadow-[0_0_20px_rgba(124,58,237,0.6)]">
             <Orbit className="w-4 h-4 text-white" />
           </motion.div>
@@ -147,75 +195,87 @@ export function Studio() {
             </div>
           </div>
         </div>
+      </DraggablePanel>
 
-        {/* Floating Instrument Toggle & Navigation */}
-        <div className="pointer-events-auto flex items-center gap-2">
+      <DraggablePanel id="studio-nav" bare defaultX={Math.max(0, window.innerWidth - 480)} defaultY={16} className="pointer-events-auto z-30">
+        <div className="flex items-center gap-2 cursor-grab active:cursor-grabbing">
           <button
             onClick={() => setShowDock(v => !v)}
-            className="p-2.5 rounded-2xl bg-black/60 border border-white/10 text-zinc-300 hover:text-white backdrop-blur-2xl shadow-2xl transition"
+            className="p-2.5 rounded-2xl text-zinc-300 hover:text-white backdrop-blur-2xl shadow-2xl transition"
             title={showDock ? "Hide Instrument Dock" : "Show Instrument Dock"}
           >
             <Sliders className="w-4 h-4" />
           </button>
 
-          <nav className="flex items-center gap-1 bg-black/60 border border-white/10 rounded-2xl p-1.5 backdrop-blur-2xl shadow-2xl">
+          <nav className="flex items-center gap-1 rounded-2xl p-1.5 backdrop-blur-2xl shadow-2xl">
             <button
-              onClick={() => { setMode('explore'); setShowDock(true); }}
+              onClick={() => toggleMode('explore')}
               className={`px-3 py-1.5 rounded-xl text-xs font-medium transition flex items-center gap-1.5 ${mode === 'explore' ? 'bg-white/20 text-white shadow' : 'text-zinc-400 hover:text-white hover:bg-white/10'}`}
             >
               <Compass className="w-3 h-3 text-violet-400" />
               <span>Instrument</span>
+              <kbd className="text-[8px] font-mono text-zinc-500 border border-white/10 rounded px-1 py-0.5 leading-none">{shortcutKey('explore')}</kbd>
             </button>
             <button
-              onClick={() => { setMode('hub'); setShowDock(false); }}
+              onClick={() => toggleMode('hub')}
               className={`px-3 py-1.5 rounded-xl text-xs font-medium transition flex items-center gap-1.5 ${mode === 'hub' ? 'bg-white/20 text-white shadow' : 'text-zinc-400 hover:text-white hover:bg-white/10'}`}
             >
               <Grid className="w-3 h-3 text-cyan-400" />
               <span>Hub</span>
+              <kbd className="text-[8px] font-mono text-zinc-500 border border-white/10 rounded px-1 py-0.5 leading-none">{shortcutKey('hub')}</kbd>
             </button>
+            {isEnabled('wizard') && (
+              <button
+                onClick={() => toggleMode('edit')}
+                className={`px-3 py-1.5 rounded-xl text-xs font-medium transition flex items-center gap-1.5 ${mode === 'edit' ? 'bg-white/20 text-white shadow' : 'text-zinc-400 hover:text-white hover:bg-white/10'}`}
+              >
+                <Edit3 className="w-3 h-3 text-fuchsia-400" />
+                <span>Content Wizard</span>
+                <kbd className="text-[8px] font-mono text-zinc-500 border border-white/10 rounded px-1 py-0.5 leading-none">{shortcutKey('wizard')}</kbd>
+              </button>
+            )}
+            {isEnabled('forge') && (
+              <button
+                onClick={() => toggleMode('forge')}
+                className={`px-3 py-1.5 rounded-xl text-xs font-medium transition flex items-center gap-1.5 ${mode === 'forge' ? 'bg-white/20 text-white shadow' : 'text-zinc-400 hover:text-white hover:bg-white/10'}`}
+              >
+                <Code className="w-3 h-3 text-emerald-400" />
+                <span>Forge</span>
+                <kbd className="text-[8px] font-mono text-zinc-500 border border-white/10 rounded px-1 py-0.5 leading-none">{shortcutKey('forge')}</kbd>
+              </button>
+            )}
+            {isEnabled('github') && (
+              <button
+                onClick={() => { toggleMode('publish'); setPubStep('idle'); }}
+                className={`px-3 py-1.5 rounded-xl text-xs font-medium transition flex items-center gap-1.5 ${mode === 'publish' ? 'bg-white/20 text-white shadow' : 'text-zinc-400 hover:text-white hover:bg-white/10'}`}
+              >
+                <Send className="w-3 h-3 text-amber-400" />
+                <span>Publish</span>
+                <kbd className="text-[8px] font-mono text-zinc-500 border border-white/10 rounded px-1 py-0.5 leading-none">{shortcutKey('publish')}</kbd>
+              </button>
+            )}
             <button
-              onClick={() => { setMode('edit'); setShowDock(false); }}
-              className={`px-3 py-1.5 rounded-xl text-xs font-medium transition flex items-center gap-1.5 ${mode === 'edit' ? 'bg-white/20 text-white shadow' : 'text-zinc-400 hover:text-white hover:bg-white/10'}`}
-            >
-              <Edit3 className="w-3 h-3 text-fuchsia-400" />
-              <span>Content Wizard</span>
-            </button>
-            <button
-              onClick={() => { setMode('forge'); setShowDock(false); }}
-              className={`px-3 py-1.5 rounded-xl text-xs font-medium transition flex items-center gap-1.5 ${mode === 'forge' ? 'bg-white/20 text-white shadow' : 'text-zinc-400 hover:text-white hover:bg-white/10'}`}
-            >
-              <Code className="w-3 h-3 text-emerald-400" />
-              <span>Forge</span>
-            </button>
-            <button
-              onClick={() => { setMode('publish'); setShowDock(false); setPubStep('idle'); }}
-              className={`px-3 py-1.5 rounded-xl text-xs font-medium transition flex items-center gap-1.5 ${mode === 'publish' ? 'bg-white/20 text-white shadow' : 'text-zinc-400 hover:text-white hover:bg-white/10'}`}
-            >
-              <Send className="w-3 h-3 text-amber-400" />
-              <span>Publish</span>
-            </button>
-            <button
-              onClick={() => { setMode('settings'); setShowDock(false); }}
+              onClick={() => toggleMode('settings')}
               className={`p-2 rounded-xl transition ${mode === 'settings' ? 'bg-white/20 text-white' : 'text-zinc-400 hover:text-white hover:bg-white/10'}`}
-              title="Settings"
+              title={`Settings (${shortcutKey('settings')})`}
             >
               <Settings className="w-3.5 h-3.5" />
             </button>
           </nav>
         </div>
-      </header>
+      </DraggablePanel>
 
-      {/* Floating Bottom Instrument Dock (Sliders for Content & Layout) */}
+      {/* Floating Bottom Instrument Dock — freely draggable */}
       <AnimatePresence>
         {showDock && mode === 'explore' && (
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 30 }}
-            transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
-            className="absolute bottom-6 left-6 right-6 z-30 max-w-5xl mx-auto"
+          <DraggablePanel
+            id="studio-dock"
+            bare
+            defaultX={Math.max(0, (window.innerWidth - 1000) / 2)}
+            defaultY={Math.max(0, window.innerHeight - 200)}
+            className="pointer-events-auto z-30"
           >
-            <div className="grid md:grid-cols-2 gap-3 bg-black/75 border border-white/15 rounded-3xl p-4 backdrop-blur-3xl shadow-[0_10px_50px_rgba(0,0,0,0.8)]">
+            <div className="grid md:grid-cols-2 gap-3 rounded-3xl p-4 backdrop-blur-3xl shadow-[0_10px_50px_rgba(0,0,0,0.8)] cursor-grab active:cursor-grabbing">
               {/* Content Slider */}
               <div>
                 <div className="flex items-center justify-between mb-2 px-1">
@@ -224,7 +284,7 @@ export function Studio() {
                   </span>
                   <span className="text-[10px] text-zinc-500 font-mono">{projects.length} available</span>
                 </div>
-                <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-none cursor-grab active:cursor-grabbing">
+                <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-none">
                   {projects.map(p => {
                     const active = projectId === p.id;
                     return (
@@ -254,7 +314,7 @@ export function Studio() {
                   </span>
                   <span className="text-[10px] text-zinc-500 font-mono">{layouts.length} worlds</span>
                 </div>
-                <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-none cursor-grab active:cursor-grabbing">
+                <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-none">
                   {layouts.map(l => {
                     const active = layoutId === l.meta.id;
                     return (
@@ -276,7 +336,7 @@ export function Studio() {
                 </div>
               </div>
             </div>
-          </motion.div>
+          </DraggablePanel>
         )}
       </AnimatePresence>
 
@@ -327,7 +387,7 @@ export function Studio() {
             </motion.div>
           )}
 
-          {mode === 'edit' && (
+          {mode === 'edit' && isEnabled('wizard') && (
             <motion.div
               key="edit"
               initial={{ opacity: 0, scale: 0.96 }}
@@ -477,7 +537,7 @@ export function Studio() {
             </motion.div>
           )}
 
-          {mode === 'forge' && (
+          {mode === 'forge' && isEnabled('forge') && (
             <motion.div
               key="forge"
               initial={{ opacity: 0, scale: 0.96 }}
@@ -525,7 +585,7 @@ export function Studio() {
             </motion.div>
           )}
 
-          {mode === 'publish' && (
+          {mode === 'publish' && isEnabled('github') && (
             <motion.div
               key="publish"
               initial={{ opacity: 0, scale: 0.95 }}
@@ -618,26 +678,36 @@ export function Studio() {
           )}
 
           {mode === 'settings' && (
-            <motion.div
-              key="settings"
-              initial={{ opacity: 0, scale: 0.96 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.96 }}
-              transition={{ duration: 0.3 }}
-              className="pointer-events-auto max-w-sm w-full space-y-4 bg-black/90 border border-white/20 rounded-3xl p-6 backdrop-blur-3xl shadow-2xl text-xs"
-            >
-              <div className="flex items-center justify-between border-b border-white/10 pb-3">
-                <h2 className="font-semibold">Studio Infrastructure</h2>
-                <button onClick={() => { setMode('explore'); setShowDock(true); }} className="text-zinc-400">Close</button>
-              </div>
-              <div className="p-3 rounded-xl bg-white/5 border border-white/10 flex items-center justify-between font-mono text-emerald-400">
-                <span>● GitHub App [gh-ai-website]</span>
-                <span className="text-zinc-500">Connected</span>
-              </div>
-            </motion.div>
+            <SettingsPanel onClose={() => { setMode('explore'); setShowDock(true); }} />
           )}
         </AnimatePresence>
       </main>
+
+      {/* Shortcuts help overlay */}
+      <AnimatePresence>
+        {showShortcuts && (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.95 }}
+            transition={{ duration: 0.2 }}
+            className="pointer-events-auto fixed bottom-6 right-6 z-[120] w-64 bg-black/90 border border-white/15 rounded-2xl p-4 backdrop-blur-2xl shadow-2xl"
+          >
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-[10px] font-mono uppercase tracking-widest text-zinc-400">Shortcuts</span>
+              <button onClick={() => setShowShortcuts(false)} className="text-zinc-500 hover:text-white text-xs">✕</button>
+            </div>
+            <div className="space-y-1.5">
+              {shortcutBindings.map(b => (
+                <div key={b.action} className="flex items-center justify-between text-[11px]">
+                  <span className="text-zinc-300">{b.label}</span>
+                  <kbd className="text-[9px] font-mono text-violet-300 border border-white/10 rounded px-1.5 py-0.5">{b.key}</kbd>
+                </div>
+              ))}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

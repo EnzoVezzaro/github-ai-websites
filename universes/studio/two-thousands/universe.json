@@ -1,0 +1,59 @@
+{
+  "meta": {
+    "id": "two-thousands",
+    "name": "Universe 04 // 2000s",
+    "slug": "two-thousands",
+    "description": "Frosted glass, glossy reflections, aqua gradients, beveled buttons and rounded everything.",
+    "author": "Web2.0",
+    "version": "1.0",
+    "createdAt": "2026-08-19T03:39:26.370Z",
+    "updatedAt": "2026-08-19T03:39:26.370Z"
+  },
+  "content": {
+    "intro": [
+      {
+        "id": "monolith-intro",
+        "zone": "intro",
+        "type": "text",
+        "data": "Deep inside the crystalline matrix, billions of transistors whisper in binary constellations."
+      }
+    ],
+    "story": [
+      {
+        "id": "monolith-story",
+        "zone": "story",
+        "type": "text",
+        "data": "Logic gates pulse at frequencies beyond human perception, dreaming of electric sheep and infinite libraries."
+      }
+    ],
+    "ideas": [
+      {
+        "id": "monolith-ideas",
+        "zone": "ideas",
+        "type": "text",
+        "data": "Autonomous intelligence, sentient circuits, silicon archaeology."
+      }
+    ],
+    "media": [
+      {
+        "id": "monolith-media",
+        "zone": "media",
+        "type": "text",
+        "data": "![Silicon](https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=1200&q=80)"
+      }
+    ],
+    "closing": [
+      {
+        "id": "monolith-closing",
+        "zone": "closing",
+        "type": "text",
+        "data": "The machine awakens when the query matches the dream."
+      }
+    ]
+  },
+  "layout": {
+    "html": "<!doctype html><html><head><style>{{css}}</style></head><body class=\"b2k\"><div class=\"window\"><div class=\"titlebar\"><span class=\"dot r\"></span><span class=\"dot y\"></span><span class=\"dot g\"></span><span class=\"title-text\">~/ website.app</span></div><div class=\"body\"><div class=\"badge\">INTRO</div><p class=\"intro\">{{intro}}</p><div class=\"badge story-b\">STORY</div><p class=\"story\">{{story}}</p><div class=\"badge ideas-b\">IDEAS</div><p class=\"ideas\">{{ideas}}</p><div class=\"media-frame\">{{media}}</div><div class=\"btn-bar\"><button class=\"aqua-btn\">{{closing}}</button></div></div></div></body></html>",
+    "css": "body.b2k{margin:0;padding:0;background:linear-gradient(135deg,#2d5f8b,#74c7ec 50%,#2d5f8b);min-height:100vh;display:flex;align-items:center;justify-content:center;font-family:'Lucida Grande','Segoe UI',sans-serif;overflow:hidden}.window{width:600px;background:rgba(255,255,255,0.15);backdrop-filter:blur(40px);-webkit-backdrop-filter:blur(40px);border-radius:20px;border:1px solid rgba(255,255,255,0.3);box-shadow:0 20px 60px rgba(0,0,0,0.3),inset 0 1px 0 rgba(255,255,255,0.4);overflow:hidden}.titlebar{display:flex;align-items:center;gap:6px;padding:12px;background:rgba(0,0,0,0.05);border-bottom:1px solid rgba(255,255,255,0.2)}.dot{width:12px;height:12px;border-radius:50%;border:1px solid rgba(0,0,0,0.1)}.dot.r{background:#ff5f56}.dot.y{background:#ffbd2e}.dot.g{background:#27c93f}.title-text{margin-left:10px;font-size:11px;color:#fff;opacity:0.8;font-weight:600}.body{padding:2rem;color:#fff}.badge{display:inline-block;padding:3px 14px;background:linear-gradient(180deg,#fff,#dfe5ee);color:#2d5f8b;font-size:10px;font-weight:bold;text-transform:uppercase;letter-spacing:1px;border-radius:20px;box-shadow:0 1px 3px rgba(0,0,0,0.2),inset 0 1px 0 #fff;margin-bottom:8px}.story-b{background:linear-gradient(180deg,#a8e6a3,#7dcea0)} .ideas-b{background:linear-gradient(180deg,#ffd6a3,#f5b041)}.intro{font-size:22px;font-weight:400;margin:0 0 24px;text-shadow:0 1px 1px rgba(0,0,0,0.3),0 0 20px rgba(255,255,255,0.3)}.story{font-size:14px;line-height:1.6;margin:0 0 24px;opacity:0.95}.ideas{font-size:13px;margin:0 0 24px;opacity:0.8}.media-frame img{width:100%;height:280px;object-fit:cover;border-radius:16px;border:2px solid rgba(255,255,255,0.3);box-shadow:0 10px 30px rgba(0,0,0,0.3)}.btn-bar{text-align:center;margin-top:2rem}.aqua-btn{padding:14px 40px;background:linear-gradient(180deg,#7dc7ee,#3a8ec9);color:#fff;font-size:15px;font-weight:600;border:1px solid rgba(255,255,255,0.4);border-radius:30px;cursor:pointer;text-shadow:0 -1px 1px rgba(0,0,0,0.3);box-shadow:0 4px 10px rgba(0,0,0,0.3),inset 0 1px 0 rgba(255,255,255,0.6)}",
+    "js": ""
+  }
+}

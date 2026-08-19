@@ -1,0 +1,11 @@
+{
+  "version": 1,
+  "skills": {
+    "modern-web-design": {
+      "source": "freshtechbro/claudedesignskills",
+      "sourceType": "github",
+      "skillPath": ".claude/skills/modern-web-design/SKILL.md",
+      "computedHash": "8ad9815a4a43dd5c3b40b3c700ef89f624d451a9e0cc1adea33909a7f22193dd"
+    }
+  }
+}

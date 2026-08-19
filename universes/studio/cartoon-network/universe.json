@@ -1,0 +1,59 @@
+{
+  "meta": {
+    "id": "cartoon-network",
+    "name": "Universe 01 // Cartoon Network",
+    "slug": "cartoon-network",
+    "description": "Bold outlines, halftone dots, punchy primary colors and comic-book panels.",
+    "author": "Studio CN",
+    "version": "1.0",
+    "createdAt": "2026-08-19T03:39:26.370Z",
+    "updatedAt": "2026-08-19T03:39:26.370Z"
+  },
+  "content": {
+    "intro": [
+      {
+        "id": "ocean-intro",
+        "zone": "intro",
+        "type": "text",
+        "data": "The ocean is a vast, interconnected neural network of fluid dynamics and ancient memory."
+      }
+    ],
+    "story": [
+      {
+        "id": "ocean-story",
+        "zone": "story",
+        "type": "text",
+        "data": "From bioluminescent trenches to sunlit surface gyres, pressure and current compose an unceasing planetary symphony."
+      }
+    ],
+    "ideas": [
+      {
+        "id": "ocean-ideas",
+        "zone": "ideas",
+        "type": "text",
+        "data": "Deep ocean telemetry, synthetic kelp forests, acoustic ecology."
+      }
+    ],
+    "media": [
+      {
+        "id": "ocean-media",
+        "zone": "media",
+        "type": "text",
+        "data": "![Abyssal](https://images.unsplash.com/photo-1518837695005-2083093ee35b?auto=format&fit=crop&w=1200&q=80)"
+      }
+    ],
+    "closing": [
+      {
+        "id": "ocean-closing",
+        "zone": "closing",
+        "type": "text",
+        "data": "Listen closely to the undertow. It remembers everything."
+      }
+    ]
+  },
+  "layout": {
+    "html": "<!doctype html><html><head><style>{{css}}</style></head><body class=\"cn\"><div class=\"cn-bg\"></div><div class=\"cn-frame\"><div class=\"cn-strip\"><div class=\"cn-panel cn-intro\"><span class=\"cn-tag\">INTRO</span><p>{{intro}}</p></div><div class=\"cn-panel cn-story\"><span class=\"cn-tag\">STORY</span><p>{{story}}</p></div></div><div class=\"cn-strip\"><div class=\"cn-panel cn-ideas\"><span class=\"cn-tag\">IDEAS</span><p>{{ideas}}</p></div><div class=\"cn-panel cn-media\">{{media}}</div></div><div class=\"cn-boom\"><span>{{closing}}</span></div></div><div class=\"cn-stars\">★ ★ ★ ★ ★</div></body></html>",
+    "css": "@import url('https://fonts.googleapis.com/css2?family=Bangers&family=Nunito:wght@400;800&display=swap');body.cn{margin:0;padding:0;background:#1a1a2e;color:#fff;font-family:'Nunito',sans-serif;min-height:100vh;overflow:hidden}.cn-bg{position:fixed;inset:0;background:radial-gradient(circle,#ff6b6b 3px,transparent 4px) 0 0/40px 40px,radial-gradient(circle,#4ecdc4 3px,transparent 4px) 20px 20px/40px 40px;opacity:0.15;z-index:0}.cn-frame{position:relative;z-index:1;padding:2rem;max-width:900px;margin:auto}.cn-strip{display:flex;gap:1rem;margin-bottom:1rem}.cn-panel{flex:1;border:5px solid #000;border-radius:16px;padding:1.5rem;background:#fff;color:#000;box-shadow:6px 6px 0 #000;position:relative}.cn-tag{position:absolute;top:-14px;left:16px;background:#ff006e;color:#fff;font-family:'Bangers',cursive;font-size:14px;padding:2px 12px;border:3px solid #000;border-radius:8px;transform:rotate(-3deg)}.cn-intro{font-size:18px;font-weight:800}.cn-story{font-size:14px;line-height:1.5}.cn-ideas{font-size:13px;background:#ffe66d}.cn-media img{width:100%;height:200px;object-fit:cover;border:3px solid #000;border-radius:12px}.cn-boom{background:#00b8ff;color:#fff;font-family:'Bangers',cursive;font-size:28px;text-align:center;padding:1rem;border:5px solid #000;border-radius:20px;box-shadow:6px 6px 0 #000;transform:rotate(-1deg);margin-top:1rem}.cn-stars{position:fixed;bottom:20px;right:30px;color:#ffd700;font-size:24px;z-index:2;letter-spacing:8px}",
+    "js": ""
+  }
+}
